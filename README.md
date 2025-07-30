@@ -32,5 +32,3 @@ January 2023 – June 2023
 ## Credits  
 Developed as part of the PCTO program in partnership with Terranova Software.
 
-## Contact  
-For questions or feedback, please contact [Your Name] at [your.email@example.com].
