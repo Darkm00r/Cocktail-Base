@@ -1,43 +1,36 @@
-Cocktail Web App
-Overview
+# Cocktail Web App
+
+## Overview  
 This project is a cocktail-themed web application developed as part of a PCTO (school-to-work program) in collaboration with Terranova Software. It allows users to explore a variety of cocktails by interacting with a backend MySQL database and external APIs to fetch cocktail data dynamically.
 
-Features
-Responsive web interface with cocktail search and filtering
+## Features  
+- Responsive web interface with cocktail search and filtering  
+- MySQL database to store cocktail information  
+- API integration to retrieve cocktail details (ingredients, instructions, images)  
+- User-friendly navigation and clean design  
 
-MySQL database to store cocktail information
+## Technologies Used  
+- Frontend: HTML, CSS, PHP  
+- Backend: MySQL database  
+- APIs: External cocktail API for real-time data fetching  
+- Development: Apache server (local environment)  
 
-API integration to retrieve cocktail details (ingredients, instructions, images)
-
-User-friendly navigation and clean design
-
-Technologies Used
-Frontend: HTML, CSS, PHP
-
-Backend: MySQL database
-
-APIs: External cocktail API for real-time data fetching
-
-Development: Apache server (local environment)
-
-Project Duration
+## Project Duration  
 January 2023 – June 2023
 
-Installation
-Clone the repository
+## Installation  
+1. Clone the repository  
+2. Import the provided MySQL database schema  
+3. Configure database connection settings in the PHP files  
+4. Deploy the project on a local Apache server or hosting environment  
 
-Import the provided MySQL database schema
+## Usage  
+- Open the web application in a browser  
+- Search for cocktails by name or ingredient  
+- Browse cocktail details including recipes and images  
 
-Configure database connection settings in the PHP files
-
-Deploy the project on a local Apache server or hosting environment
-
-Usage
-Open the web application in a browser
-
-Search for cocktails by name or ingredient
-
-Browse cocktail details including recipes and images
-
-Credits
+## Credits  
 Developed as part of the PCTO program in partnership with Terranova Software.
+
+## Contact  
+For questions or feedback, please contact [Your Name] at [your.email@example.com].
