@@ -1,0 +1,479 @@
+<?php
+session_start();
+if (!isset($_SESSION['user_id'])) {
+    header("Location: form.php"); // Reindirizza al login se non è autenticato
+    exit();
+}
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cocktail.Base</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* Stile generale del corpo */
+        body {
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            font-family: 'Poppins', 'Segoe UI', sans-serif;
+            color: #fff;
+        }
+
+        /* Navbar */
+        .navbar {
+            background-color: rgba(107, 131, 155, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+            padding: 0.5rem 0; 
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            transition: background-color 0.3s ease; /* Aggiunta della transizione */
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            padding: 0 30px;
+        }
+
+        .logo {
+            margin-right: auto;
+        }
+
+        .nav-links a {
+            position: relative; /* Necessario per il posizionamento del pseudo-elemento */
+            color: #fff;
+            text-decoration: none;
+            font-size: 15px;
+            font-weight: 500;
+            transition: color 0.3s ease; /* Transizione per il colore */
+            padding: 8px 15px;
+            letter-spacing: 0.5px;
+        }
+
+        .nav-links a::after {
+            content: ''; /* Crea un pseudo-elemento */
+            position: absolute;
+            left: 50%; /* Posiziona al centro */
+            bottom: -5px; /* Posiziona sotto il link */
+            width: 0; /* Inizialmente invisibile */
+            height: 2px; /* Altezza della riga */
+            background-color: rgba(214, 80, 80, 0.8); /* Colore della riga */
+            transition: width 0.3s ease, left 0.3s ease; /* Transizione per larghezza e posizione */
+        }
+
+        .nav-links a:hover::after {
+            width: 100%; /* Espandi la riga al passaggio del mouse */
+            left: 0; /* Allinea a sinistra */
+        }
+
+        /* Menu utente */
+        .user-menu {
+            position: relative;
+            margin-left: auto;
+            margin-right: 20px;
+        }
+
+        .user-box {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background-color: #c0392b;
+            color: white;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            transition: none !important;
+            transform: none !important;
+        }
+
+        .user-box:hover, .user-box:active, .user-box:focus {
+            background-color: #c0392b !important;
+            color: white !important;
+            transform: none !important;
+            box-shadow: none !important;
+            border-color: transparent !important;
+        }
+
+        /* Contenuto del dropdown */
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 50px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            min-width: 220px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            z-index: 1;
+            overflow: hidden;
+            animation: fadeIn 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .dropdown-content a {
+            color: white;
+            padding: 14px 20px;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            position: relative;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .dropdown-content a:last-child {
+            border-bottom: none;
+        }
+
+        .dropdown-content a:hover {
+            background-color: rgba(255, 255, 255, 0.15);
+            padding-left: 25px;
+        }
+
+        .dropdown-content a::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 3px;
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            transform: scaleY(0);
+            transition: transform 0.3s ease;
+        }
+
+        .dropdown-content a:hover::before {
+            transform: scaleY(1);
+        }
+
+        /* Contenitore della privacy */
+        .privacy-container {
+            max-width: 800px;
+            margin: 100px auto 50px;
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .privacy-container h1 {
+            color: #e74c3c;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.2rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        .privacy-container h2 {
+            color: #fff;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 10px;
+        }
+
+        .privacy-container p {
+            margin-bottom: 20px;
+            line-height: 1.6;
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .privacy-container ul {
+            margin-bottom: 20px;
+            padding-left: 20px;
+        }
+
+        .privacy-container li {
+            margin-bottom: 10px;
+            line-height: 1.6;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .privacy-container a {
+            color: #e74c3c;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .privacy-container a:hover {
+            text-decoration: underline;
+        }
+
+        /* Sezione footer */
+        .footer-section {
+            text-align: center; /* Centra il testo */
+        }
+
+        .footer {
+            text-align: center;
+            padding: 20px;
+            margin-top: 50px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+        }
+
+        .footer a {
+            color: rgb(255, 255, 255);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        .social-links {
+            display: flex;
+            justify-content: center; /* Centra i loghi */
+            gap: 1rem; /* Spazio tra i loghi */
+            margin-top: 10px; /* Spazio sopra i loghi */
+        }
+
+        @media (max-width: 850px) {
+            .privacy-container {
+                width: 90%;
+                padding: 30px;
+                margin-top: 80px;
+            }
+        }
+
+        /* Pulsante preferito */
+        .favorite-btn {
+            background-color: rgb(8, 8, 6); /* Colore di sfondo verde */
+            color: rgb(255, 255, 255); /* Colore del testo */
+            border: none; /* Nessun bordo */
+            padding: 10px 15px; /* Padding */
+            border-radius: 5px; /* Angoli arrotondati */
+            cursor: pointer; /* Cambia il cursore al passaggio del mouse */
+            transition: background-color 0.3s, transform 0.2s; /* Transizione al passaggio del mouse */
+            font-size: 14px; /* Dimensione del testo */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Ombra per un effetto di profondità */
+        }
+
+        .favorite-btn:hover {
+            background-color: #45a049; /* Colore al passaggio del mouse */
+            transform: scale(1.05); /* Leggero ingrandimento al passaggio del mouse */
+        }   
+    </style>
+</head>
+<body>
+    
+
+<nav class="navbar">
+    <div class="nav-container">
+        <div class="logo">
+            <img src="img/primo_logo_terranova-removebg-preview.png" alt="Cocktail.Base Logo">
+        </div>
+        <ul class="nav-links">
+            <li><a href="#home">Home</a></li>
+            <li><a href="#search">Cerca</a></li>
+            <li><a href="#popular">Cocktail</a></li>
+            <li><a href="#about">Chi Siamo</a></li>
+        </ul>
+        <div class="user-menu">
+            <button class="user-box" onclick="toggleDropdown()">
+                <i class="fas fa-user-circle" style="font-size: 18px; margin-right: 8px;"></i>
+                <?php echo $_SESSION['user_email']; ?>
+            </button>
+            <div class="dropdown-content" id="dropdownMenu">
+                <a href="crea_cocktail.php">Crea Cocktail</a>
+                <a href="cambia_password.php">Cambia Password</a>
+                <a href="elimina_account.php">Elimina Account</a>
+                <a href="preferiti.php">Cocktail Preferiti</a>
+                <a href="logout.php">Logout</a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+    <section id="home" class="section hero">
+        <div class="hero-content">
+            <h1>Benvenuto <?php echo $_SESSION['user_email']; ?></h1>
+            <p>Scopri il mondo dei cocktail</p>
+            <a href="#search" class="cta-button">Inizia a Cercare</a>
+        </div>
+    </section>
+
+    
+    <section id="popular" class="section">
+    <div class="popular-container">
+        <h2>Cocktail Popolari</h2>
+        <div class="popular-cocktails" id="popularCocktails">
+            <div class="cocktail-card">   
+                <img src="img/mojito.jpg" alt="Mojito">
+                <div class="cocktail-info">
+                    <h3>Mojito</h3>
+                    <p>Rinfrescante mix di menta e lime</p>
+                    <button onclick="getCocktailDetails('11000')" class="details-btn">Dettagli</button>
+                    <button class="favorite-btn" onclick="addToFavorites('11000')">Aggiungi ai Preferiti</button>
+                </div>
+            </div>
+            <div class="cocktail-card">
+                <img src="img/old-fashioned-cocktail.png" alt="Old Fashioned">
+                <div class="cocktail-info">
+                    <h3>Old Fashioned</h3>
+                    <p>Classico cocktail a base di bourbon e zucchero</p>
+                    <button onclick="getCocktailDetails('11001')" class="details-btn">Dettagli</button>
+                    <button class="favorite-btn" onclick="addToFavorites('11001')">Aggiungi ai Preferiti</button>
+                </div>
+            </div>
+            <div class="cocktail-card">
+                <img src="img/long-island.png" alt="Long Island">
+                <div class="cocktail-info">
+                    <h3>Long Island</h3>
+                    <p>Potente combinazione di vari alcolici</p>
+                    <button onclick="getCocktailDetails('11002')" class="details-btn">Dettagli</button>
+                    <button class="favorite-btn" onclick="addToFavorites('11002')">Aggiungi ai Preferiti</button>
+                </div>
+            </div>
+            <div class="cocktail-card">
+                <img src="img/negroni.jpg" alt="Negroni">
+                <div class="cocktail-info">
+                    <h3>Negroni</h3>
+                    <p>Amaro e aromatico, con gin e vermouth</p>
+                    <button onclick="getCocktailDetails('11003')" class="details-btn">Dettagli</button>
+                    <button class="favorite-btn" onclick="addToFavorites('11003')">Aggiungi ai Preferiti</button>
+                </div>
+            </div>
+            <div class="cocktail-card">
+                <img src="img/martini.png" alt="Dry Martini">
+                <div class="cocktail-info">
+                    <h3>DRY MARTINI</h3>
+                    <p>Elegante mix di gin e vermouth secco</p>
+                    <button onclick="getCocktailDetails('11005')" class="details-btn">Dettagli</button>
+                    <button class="favorite-btn" onclick="addToFavorites('11005')">Aggiungi ai Preferiti</button>
+                </div>
+            </div>
+            <div class="cocktail-card">
+                <img src="img/daiquiri.png" alt="Daiquiri">
+                <div class="cocktail-info">
+                    <h3>Daiquiri</h3>
+                    <p>Dolce e aspro, a base di rum e lime</p>
+                    <button onclick="getCocktailDetails('11006')" class="details-btn">Dettagli</button>
+                    <button class="favorite-btn" onclick="addToFavorites('11006')">Aggiungi ai Preferiti</button>
+                </div>
+            </div>
+            <div class="cocktail-card">
+                <img src="img/margarita.png" alt="Margarita">
+                <div class="cocktail-info">
+                    <h3>Margarita</h3>
+                    <p>Fresco e salato, con tequila e lime</p>
+                    <button onclick="getCocktailDetails('11007')" class="details-btn">Dettagli</button>
+                    <button class="favorite-btn" onclick="addToFavorites('11007')">Aggiungi ai Preferiti</button>
+                </div>
+            </div>
+            <div class="cocktail-card">
+                <img src="img/manhattan.png" alt="Manhattan">
+                <div class="cocktail-info">
+                    <h3>Manhattan</h3>
+                    <p>Ricco e sofisticato, con whisky e vermouth</p>
+                    <button onclick="getCocktailDetails('11008')" class="details-btn">Dettagli</button>
+                    <button class="favorite-btn" onclick="addToFavorites('11008')">Aggiungi ai Preferiti</button>
+                </div>
+            </div>
+        </div> <!-- chiusura per .popular-cocktails -->
+    </div> <!-- chiusura per .popular-container -->
+</section>
+
+    
+
+    <section id="about" class="section about-section">
+        <h2>Chi Siamo</h2>
+        <p>Cocktail.Base è il punto di riferimento per tutti gli amanti dei cocktail. Se sei un bartender esperto o un neofita che vuole esplorare il mondo delle miscelazioni, qui troverai risorse, ricette e curiosità per arricchire la tua esperienza. Siamo appassionati di mixologia e il nostro obiettivo è aiutarti a creare drink indimenticabili, sia a casa che al bancone. Unisciti a noi in questa avventura di sapori e creatività!</p>
+    </section>
+
+    <section id="search" class="section search-section">
+        <div class="search-container">
+            <h2>Cerca il tuo Cocktail</h2>
+            
+            <div class="search-form">
+                <div class="form-group">
+                    <label for="searchType">Tipo di ricerca:</label>
+                    <select id="searchType">
+                        <option value="name">Nome</option>
+                        <option value="ingredient">Ingrediente</option>
+                        <option value="category">Categoria</option>
+                        <option value="random">Random</option>
+                    </select>
+                </div>
+                
+                <div class="form-group cocktail-name-container">
+                    <label for="cocktailName">Nome del cocktail:</label>
+                    <input type="text" id="cocktailName" placeholder="Inserisci il nome del cocktail">
+                </div>
+                
+                <button onclick="performSearch()">Cerca</button>
+            </div>
+    
+            <div id="results" class="results-grid"></div>
+        </div>
+
+        <footer class="footer">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Cocktail.Base</h3>
+                    <p>La tua destinazione ideale per scoprire e imparare tutto sui cocktail. Esplora la nostra ampia selezione di ricette, impara nuove tecniche e trova il drink perfetto per ogni occasione.</p>
+                    <p>Per saperne di più, leggi la nostra <a href="privacy_policy.php" style="color: white;">Privacy Policy</a>.</p>
+
+                </div>
+                <div class="footer-section">
+                    <h3>Link Utili</h3>
+                    <ul>
+                        <li><a href="#search">Cerca Cocktail</a></li>
+                        <li><a href="#popular">Cocktail Popolari</a></li>
+                        <li><a href="#about">Chi Siamo</a></li>
+                        <li><a href="#home">Home</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Seguici</h3>
+                    <div class="social-links">
+                        <a href="#" target="_blank"><i class="fab fa-tiktok"></i></a>
+                        <a href="#" target="_blank"><i class="fab fa-instagram"></i></a>
+                        <a href="#" target="_blank"><i class="fab fa-youtube"></i></a>
+                        <a href="#" target="_blank"><i class="fab fa-pinterest"></i></a>
+                    </div>
+                </div>
+
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Cocktail.Base Tutti i diritti riservati.</p>
+            </div>
+        </footer>
+
+
+    <script src="js/script.js"></script>
+
+</body>
+</html>
